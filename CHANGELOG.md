@@ -2,7 +2,7 @@
 
 ## Unreleased — hosted browser worker policy, 2026-10-09
 
-Embed the bundled inspector as a blob worker so it inherits the document's connection-blocking CSP on GitHub Pages. Release its object URL after inspection, timeout, error or Clear. Existing release archives remain unchanged.
+Embed the bundled inspector as a blob worker so it inherits the document's connection-blocking CSP on GitHub Pages. Release its object URL after inspection, timeout, error or Clear. Version the browser controller's URL using its content hash to prevent a fresh page from loading an older cached controller. Existing release archives remain unchanged.
 
 ## 0.1.1 — imported-content detection fix, 2026-10-09
 
