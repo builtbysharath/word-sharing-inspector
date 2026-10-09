@@ -2,6 +2,11 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>DOCX Metadata Inspector | Word Sharing Inspector</title>
+<link rel="canonical" href="https://builtbysharath.github.io/word-sharing-inspector/">
+<meta property="og:title" content="DOCX Metadata Inspector | Word Sharing Inspector">
+<meta property="og:description" content="Review Word metadata, comments, tracked changes and hidden text locally. Your document is never uploaded or rewritten.">
+<meta property="og:url" content="https://builtbysharath.github.io/word-sharing-inspector/">
+<meta property="og:type" content="website">
 <meta name="description" content="Inspect Word DOCX metadata, comments, tracked changes and hidden text locally in your browser. No document uploads. Free, open source and read only."><link rel="stylesheet" href="./style.css"><script src="./app.js" type="module"></script></head>
 <body><main><header><span class="eyebrow">LOCAL DOCUMENT CHECK</span><h1>Inspect your Word<br>document before sharing.</h1><p class="intro">Find comments, old edits and hidden details that may travel with your Word file.</p></header>
 <section class="upload" aria-label="Inspect a document"><div><h2>Word Sharing Inspector</h2><p>Choose a .docx file. It stays on your device.</p><label class="file-label" for="file">Choose a Word document</label><input id="file" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><p class="small">Read only · No uploads · No account · Up to 25 MB</p></div><div class="sample"><p>Start with a fictional proposal containing a few sharing surprises.</p><button id="demo" class="secondary">Try the sample</button><button id="download-demo" class="text-button">Download sample .docx</button></div></section>
@@ -9,4 +14,4 @@
 <section id="results" hidden aria-label="Inspection results"><div class="result-head"><div><span class="eyebrow">YOUR RESULTS</span><h2 id="filename"></h2><p id="summary"></p><p id="file-info" class="small"></p></div><div class="report-actions"><button id="download-report" disabled>Save JSON report</button><button id="clear" class="text-button">Clear document</button></div></div>
 <nav id="categories" aria-label="Filter findings"></nav><p id="shown" class="small"></p><div id="findings"></div>
 <details class="coverage"><summary>What this check covers</summary><ul id="coverage-list"></ul><p>Checked: comments, saved revision markup, direct hidden text, properties, embedded-file references, external package links and selected extra data.</p><p>Reports include excerpts and names. Review them before sharing.</p><p class="small">Original file SHA-256</p><code id="hash"></code></details></section>
-<footer><p>This check helps you review a file. It does not certify that a document is safe to share or remove its contents.</p><p>Open source · MIT licensed</p></footer></main></body></html>
+<footer><p>This check helps you review a file. It does not certify that a document is safe to share or remove its contents.</p><p><a href="./about.html">Coverage and privacy</a> · <a href="https://github.com/builtbysharath/word-sharing-inspector">Open source on GitHub</a> · MIT licensed</p></footer></main></body></html>

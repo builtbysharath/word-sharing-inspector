@@ -46,12 +46,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/73sharath73/word-sharing-inspector.git"
+    "url": "https://github.com/builtbysharath/word-sharing-inspector.git"
   },
   "bugs": {
-    "url": "https://github.com/73sharath73/word-sharing-inspector/issues"
+    "url": "https://github.com/builtbysharath/word-sharing-inspector/issues"
   },
-  "homepage": "https://github.com/73sharath73/word-sharing-inspector#readme",
+  "homepage": "https://builtbysharath.github.io/word-sharing-inspector/",
   "keywords": [
     "docx",
     "document-metadata",

@@ -1,6 +1,6 @@
 # DOCX Metadata Inspector — Word Sharing Inspector
 
-[![CI](https://github.com/73sharath73/word-sharing-inspector/actions/workflows/ci.yml/badge.svg)](https://github.com/73sharath73/word-sharing-inspector/actions/workflows/ci.yml)
+[![CI](https://github.com/builtbysharath/word-sharing-inspector/actions/workflows/ci.yml/badge.svg)](https://github.com/builtbysharath/word-sharing-inspector/actions/workflows/ci.yml)
 
 **Check what travels with a Word document before you share it.**
 
@@ -12,7 +12,11 @@ Word Sharing Inspector finds saved comments, tracked changes, hidden text and se
 
 ## Try the browser app
 
-Download the **[prebuilt browser ZIP](https://github.com/73sharath73/word-sharing-inspector/releases/download/v0.1.1/word-sharing-inspector-0.1.1-browser.zip)** and extract it. With Node 22+ installed, run this inside the extracted folder:
+**[Open Word Sharing Inspector](https://builtbysharath.github.io/word-sharing-inspector/)** — no installation or account needed. Try the fictional sample first. Your selected document is processed in your browser and remains unchanged.
+
+## Run it locally
+
+Download the **[prebuilt browser ZIP](https://github.com/builtbysharath/word-sharing-inspector/releases/download/v0.1.1/word-sharing-inspector-0.1.1-browser.zip)** and extract it. With Node 22+ installed, run this inside the extracted folder:
 
 ```sh
 node serve.js
@@ -23,7 +27,7 @@ Open **http://127.0.0.1:8765**, click **Try the sample**, or choose a `.docx` fi
 Prefer the source checkout?
 
 ```sh
-git clone https://github.com/73sharath73/word-sharing-inspector.git
+git clone https://github.com/builtbysharath/word-sharing-inspector.git
 cd word-sharing-inspector
 npm ci
 npm run build
@@ -59,7 +63,7 @@ Supports ordinary macro-free `.docx` files up to 25 MB. It does not inspect imag
 
 [Full coverage and limits](docs/COVERAGE.md) · [Validation evidence](VALIDATION.md) · [Comparison with existing tools](BENCHMARK.md)
 
-Try the fictional sample first. [Tell us which findings are useful or confusing](https://github.com/73sharath73/word-sharing-inspector/issues/new). Share a sanitized report or a fictional reproduction rather than a sensitive document.
+Try the fictional sample first. [Tell us which findings are useful or confusing](https://github.com/builtbysharath/word-sharing-inspector/issues/new). Share a sanitized report or a fictional reproduction rather than a sensitive document.
 
 [How do I check Word metadata before sharing?](docs/check-word-metadata.md)
 
@@ -70,6 +74,6 @@ npm test
 npm run build
 ```
 
-MIT licensed · [Releases](https://github.com/73sharath73/word-sharing-inspector/releases) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Dependency notices](THIRD_PARTY_NOTICES.md)
+MIT licensed · [Releases](https://github.com/builtbysharath/word-sharing-inspector/releases) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Dependency notices](THIRD_PARTY_NOTICES.md)
 
 Initial experimental releases are published on GitHub; npm registry publication has not occurred.

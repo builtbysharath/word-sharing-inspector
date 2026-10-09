@@ -5,7 +5,7 @@ import {zipSync, strToU8} from 'fflate';
 const output = process.argv[2];
 if (!output) throw new Error('Usage: node scripts/package-browser.js OUTPUT.zip (run npm run build first).');
 const entries = {};
-for (const name of ['index.html', 'style.css', 'app.js', 'worker.js']) entries[name] = await readFile(new URL('../public/' + name, import.meta.url));
+for (const name of ['index.html', 'style.css', 'app.js', 'worker.js', 'about.html', 'sitemap.xml']) entries[name] = await readFile(new URL('../public/' + name, import.meta.url));
 for (const name of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) entries[name] = await readFile(new URL('../' + name, import.meta.url));
 const server = await readFile(new URL('./serve.js', import.meta.url), 'utf8');
 if (!server.includes("new URL('../public/', import.meta.url)")) throw new Error('The browser launcher needs updating for the current server layout.');
