@@ -1,7 +1,7 @@
 {
   "name": "word-sharing-inspector",
-  "version": "0.1.0",
-  "description": "Inspect DOCX sharing surprises locally: revisions, comments, hidden text, properties and linked or embedded content.",
+  "version": "0.1.1",
+  "description": "Inspect DOCX metadata, comments, tracked changes and hidden text locally. No document uploads.",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -19,6 +19,7 @@
     "web",
     "examples",
     "test",
+    "docs",
     "README.md",
     "VALIDATION.md",
     "BENCHMARK.md",
@@ -33,7 +34,8 @@
     "build": "node scripts/build.js",
     "demo": "node scripts/make-demo.js",
     "start": "node scripts/serve.js",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "pack:browser": "node scripts/package-browser.js"
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.8.11",
@@ -49,5 +51,15 @@
   "bugs": {
     "url": "https://github.com/73sharath73/word-sharing-inspector/issues"
   },
-  "homepage": "https://github.com/73sharath73/word-sharing-inspector#readme"
+  "homepage": "https://github.com/73sharath73/word-sharing-inspector#readme",
+  "keywords": [
+    "docx",
+    "document-metadata",
+    "microsoft-word",
+    "tracked-changes",
+    "hidden-text",
+    "document-inspection",
+    "privacy",
+    "local-first"
+  ]
 }

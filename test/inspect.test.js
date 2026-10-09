@@ -8,6 +8,7 @@ import {spawnSync} from 'node:child_process';
 import {inspect} from '../src/inspect.js';
 import {openPackage, LIMITS} from '../src/zip.js';
 import {demoParts, makeDemo, packageParts, WORD_NS, REL_NS} from '../examples/demo.js';
+import {importedContentParts} from '../examples/imported-content.js';
 const parse = parts => inspect(packageParts(parts));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const body = markup => '<w:document xmlns:w="' + WORD_NS + '"><w:body>' + markup + '</w:body></w:document>';
@@ -64,6 +65,28 @@ test('declared Word XML content types do not require a lowercase xml extension',
 test('an embedded file is not counted again through its relationship or directory', () => {
   const parts = demoParts(); parts['word/embeddings/'] = new Uint8Array(); parts['word/_rels/document.xml.rels'] = '<Relationships xmlns="' + REL_NS + '"><Relationship Id="embed" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/package" Target="embeddings/demo-notes.txt"/></Relationships>';
   assert.equal(parse(parts).counts.embedded, 1);
+});
+test('aFChunk imports outside word/embeddings are reported without inspecting the imported payload', () => {
+  for (const strict of [false, true]) {
+    const bytes = packageParts(importedContentParts({strict})), before = hash(bytes), report = inspect(bytes);
+    assert.equal(report.counts.embedded, 1);
+    const finding = report.findings.find(item => item.category === 'embedded');
+    assert.match(finding.relationshipType, /\/aFChunk$/);
+    assert.equal(finding.detail, '../imports/review.html');
+    assert.match(finding.action, /inspect it separately/);
+    assert.equal(hash(bytes), before);
+  }
+});
+test('aFChunk targets under word/embeddings are not counted twice', () => {
+  const report = parse(importedContentParts({embedded: true}));
+  assert.equal(report.counts.embedded, 1);
+  assert.equal(report.findings[0].title, 'Embedded file');
+});
+test('external aFChunk references are links and are never fetched', () => {
+  const report = parse(importedContentParts({external: true}));
+  assert.equal(report.counts.embedded, 0);
+  assert.equal(report.counts.links, 1);
+  assert.equal(report.findings[0].detail, 'https://example.test/review.html');
 });
 test('hidden styles are reported with unresolved rendered-scope coverage', () => {
   const parts = demoParts({clean: true}); parts['word/styles.xml'] = '<w:styles xmlns:w="' + WORD_NS + '"><w:style w:styleId="Secret"><w:rPr><w:vanish/></w:rPr></w:style></w:styles>';

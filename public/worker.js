@@ -5386,7 +5386,7 @@ function inspect(bytes, { filename = "document.docx" } = {}) {
         "Check whether the destination or linked content should be included. This inspector does not open it.",
         { relationshipType: rel.getAttribute("Type"), relationshipId: rel.getAttribute("Id") }
       );
-      else if (/\/(oleObject|package|altChunk)$/.test(rel.getAttribute("Type"))) {
+      else if (/\/(oleObject|package|aFChunk|altChunk)$/.test(rel.getAttribute("Type"))) {
         const owner = entry.name === "_rels/.rels" ? "" : entry.name.replace(/(^|\/)\_rels\//, "$1").replace(/\.rels$/, "");
         const target = resolvePart(owner, rel.getAttribute("Target"));
         if (target?.startsWith("word/embeddings/") && pkg.entries.some((item) => item.name === target && !item.name.endsWith("/"))) continue;
