@@ -1,0 +1,22 @@
+import {zipSync, strToU8} from 'fflate';
+export const WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+export const REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships';
+export function demoParts({clean = false, prefix = 'w'} = {}) {
+  const p = prefix;
+  return {
+    '[Content_Types].xml': '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' + (clean ? '' : '<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/custom.xml" ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml"/>') + '</Types>',
+    '_rels/.rels': '<Relationships xmlns="' + REL_NS + '"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' + (clean ? '' : '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>') + '</Relationships>',
+    'word/document.xml': '<' + p + ':document xmlns:' + p + '="' + WORD_NS + '"><' + p + ':body><' + p + ':p><' + p + ':r><' + p + ':t>Project proposal — ready to share?</' + p + ':t></' + p + ':r></' + p + ':p>' + (clean ? '' : '<' + p + ':p><' + p + ':commentRangeStart ' + p + ':id="0"/><' + p + ':r><' + p + ':t>Delivery in four weeks.</' + p + ':t></' + p + ':r><' + p + ':commentRangeEnd ' + p + ':id="0"/><' + p + ':r><' + p + ':commentReference ' + p + ':id="0"/></' + p + ':r></' + p + ':p><' + p + ':p><' + p + ':del ' + p + ':id="1" ' + p + ':author="Alex Example" ' + p + ':date="2026-10-01T10:00:00Z"><' + p + ':r><' + p + ':delText>Internal minimum price: $8,000.</' + p + ':delText></' + p + ':r></' + p + ':del><' + p + ':ins ' + p + ':id="2" ' + p + ':author="Sam Example"><' + p + ':r><' + p + ':t>Quoted price: $12,000.</' + p + ':t></' + p + ':r></' + p + ':ins></' + p + ':p><' + p + ':p><' + p + ':r><' + p + ':rPr><' + p + ':vanish/></' + p + ':rPr><' + p + ':t>Internal note: the draft margin is provisional.</' + p + ':t></' + p + ':r></' + p + ':p>') + '<' + p + ':sectPr/></' + p + ':body></' + p + ':document>',
+    ...clean ? {} : {
+      'word/comments.xml': '<w:comments xmlns:w="' + WORD_NS + '"><w:comment w:id="0" w:author="Alex Example" w:date="2026-10-01T10:00:00Z"><w:p><w:r><w:t>Confirm the timeline before sending this.</w:t></w:r></w:p></w:comment></w:comments>',
+      'word/_rels/document.xml.rels': '<Relationships xmlns="' + REL_NS + '"><Relationship Id="comment1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/><Relationship Id="link1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://example.com/private-draft" TargetMode="External"/></Relationships>',
+      'docProps/core.xml': '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator>Alex Example</dc:creator><cp:lastModifiedBy>Sam Example</cp:lastModifiedBy></cp:coreProperties>',
+      'docProps/custom.xml': '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><property fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}" pid="2" name="InternalReference"><vt:lpwstr>DEMO-CLIENT-42</vt:lpwstr></property></Properties>',
+      'word/embeddings/demo-notes.txt': 'Synthetic embedded-file example. No real client data.'
+    }
+  };
+}
+export function packageParts(parts) {
+  return zipSync(Object.fromEntries(Object.entries(parts).map(([path, text]) => [path, typeof text === 'string' ? strToU8(text) : text])), {level: 6, mtime: new Date(2026, 0, 1, 12, 0, 0)});
+}
+export function makeDemo() {return packageParts(demoParts());}

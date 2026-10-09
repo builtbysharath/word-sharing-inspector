@@ -1,0 +1,13 @@
+# Validation — 9 October 2026
+
+39 automated tests passed on Node 22.23.3 and the development runtime (Node 23.10.0). The browser build succeeds. Regressions cover ZIP/XML boundaries, unchanged input bytes, namespaces including Strict custom properties, modern reviewer contact records, resolved/reply metadata, current versus historical hidden formatting, Web Layout-only text, declared/default content types, linked fields, output aliasing/private report writes, stale file-read races and clearing result metadata.
+
+Ten upstream LibreOffice regression DOCX files and two fictional samples matched independently counted comment/revision/reviewer-identity records. [BENCHMARK.md](BENCHMARK.md) records the files, exact source commit, comparison setup and limits. The final python-docx 1.2.0 sample reports one comment, one hidden run, eight selected properties and two distinct custom-XML parts. Property noise was reduced by excluding routine statistics. Its editing-application property is inherited from the producer's template and is not evidence of native Word creation.
+
+In the browser, the fictional sample returned nine expected findings, category filtering worked, and the independent producer file returned twelve findings. The saved producer JSON was readable and its SHA-256 matched the original file (`39e5a15544550c88c3f26437ab9509ae18de3a7fc77e1f9c99f26f36c75a86d8`). Clear document removed filename, summary, file details and hash text. Earlier browser checks also covered a minimal clean file. Source bytes were unchanged. No user business documents were scanned.
+
+mat2 0.15.0's Office library was run in an isolated subset of its unchanged modules; the full CLI was unavailable because of system dependencies. This comparison covers metadata extraction, not cleanup or image/embedded metadata. Microsoft Word/LibreOffice native rendering and Windows Document Inspector were not tested.
+
+Separate static review findings led to fixes for modern identities, hidden-format history, property noise, duplicate embedded findings, Strict custom properties and package freshness. Packed-package clean installation, CLI/library smoke checks and the shipped static server were verified. CI is configured locally for Linux/macOS on Node 22/24 but has not run remotely. Human demand remains unverified. These local validation runs preceded GitHub publication. Public hosting, npm registry publication and OSS-program application submission have not occurred.
+
+Publication: the repository CI matrix checks Linux/macOS on Node 22/24. Its live status is shown by the README badge. Local source validation and captured benchmarks remain dated evidence, not a promise that every live case or Office producer is supported.
