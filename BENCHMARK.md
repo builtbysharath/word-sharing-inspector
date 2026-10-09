@@ -1,4 +1,4 @@
-# Word corpus and limited mat2 comparison — 9 October 2026
+# Word corpus and limited mat2 comparison: 9 October 2026
 
 Ten DOCX documents were downloaded from LibreOffice's public regression corpus at commit `ef716a71357f7d3b9657442c5ba9e4b342dd37fa`. Files remained unchanged. Python's standard-library ZIP/XML parser independently counted comment and revision records and modern reviewer identity records; Inspector counts matched all of those records. Names in upstream fixtures belong to the original regression documents; no user business documents were scanned.
 

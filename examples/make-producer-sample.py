@@ -11,5 +11,5 @@ paragraph = document.add_paragraph("Delivery estimate: four weeks.")
 document.add_comment(paragraph.runs, author="Taylor Example", initials="TE", text="Confirm this estimate before sharing.")
 hidden = document.add_paragraph().add_run("Internal planning note, not intended for the recipient.")
 hidden.font.hidden = True
-document.sections[0].header.paragraphs[0].text = "Synthetic example — no client data"
+document.sections[0].header.paragraphs[0].text = "Synthetic example: no client data"
 document.save(Path(__file__).with_name("producer-sample.docx"))

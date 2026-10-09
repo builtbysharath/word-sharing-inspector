@@ -1,4 +1,4 @@
-# Word Document Inspector for Mac — Word Sharing Inspector
+# Word Document Inspector for Mac: Word Sharing Inspector
 
 [![CI](https://github.com/builtbysharath/word-sharing-inspector/actions/workflows/ci.yml/badge.svg)](https://github.com/builtbysharath/word-sharing-inspector/actions/workflows/ci.yml)
 
@@ -14,7 +14,7 @@ Built for Word for Mac users: [Microsoft documents that Word for Mac has no buil
 
 ## Try it on your Mac
 
-**[Open Word Sharing Inspector](https://builtbysharath.github.io/word-sharing-inspector/)** — no installation or account needed. Try the fictional sample first. Your selected document is processed in your browser and remains unchanged.
+**[Open Word Sharing Inspector](https://builtbysharath.github.io/word-sharing-inspector/)**. No installation or account needed. Try the fictional sample first. Your selected document is processed in your browser and remains unchanged.
 
 ## Run it locally
 

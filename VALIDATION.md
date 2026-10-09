@@ -1,4 +1,4 @@
-# Validation — 9 October 2026
+# Validation: 9 October 2026
 
 For v0.1.0, 39 automated tests passed on Node 22.23.3 and the development runtime (Node 23.10.0). The browser build succeeds. Regressions cover ZIP/XML boundaries, unchanged input bytes, namespaces including Strict custom properties, modern reviewer contact records, resolved/reply metadata, current versus historical hidden formatting, Web Layout-only text, declared/default content types, linked fields, output aliasing/private report writes, stale file-read races and clearing result metadata.
 
