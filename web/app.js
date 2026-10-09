@@ -2,8 +2,13 @@ import {makeDemo} from '../examples/demo.js';
 const $ = selector => document.querySelector(selector);
 const labels = {comments: 'Comments', revisions: 'Tracked changes', hidden: 'Hidden text', properties: 'Properties', embedded: 'Embedded content', links: 'External links', extra: 'Extra data'};
 let report = null, worker = null, task = 0;
+function stopWorker(active = worker) {
+  if (!active) return;
+  active.terminate(); URL.revokeObjectURL(active.sourceUrl);
+  if (worker === active) worker = null;
+}
 function resetReport() {
-  worker?.terminate(); worker = null; report = null;
+  stopWorker(); report = null;
   $('#results').hidden = true; $('#download-report').disabled = true;
   for (const selector of ['#findings', '#categories', '#coverage-list']) $(selector).replaceChildren();
   for (const selector of ['#filename', '#summary', '#file-info', '#shown', '#hash']) $(selector).textContent = '';
@@ -37,12 +42,15 @@ async function run(bytes, filename, synthetic = false, current = ++task) {
   const original = new Uint8Array(bytes);
   const hash = crypto.subtle ? await crypto.subtle.digest('SHA-256', original).then(buffer => [...new Uint8Array(buffer)].map(byte => byte.toString(16).padStart(2, '0')).join('')) : null;
   if (current !== task) return;
-  worker = new Worker('./worker.js', {type: 'module'});
+  const sourceUrl = URL.createObjectURL(new Blob([__INSPECTOR_WORKER_SOURCE__], {type: 'text/javascript'}));
+  try {worker = new Worker(sourceUrl, {type: 'module'});}
+  catch (error) {URL.revokeObjectURL(sourceUrl); throw error;}
+  worker.sourceUrl = sourceUrl;
   const active = worker;
-  const timer = setTimeout(() => {active.terminate(); if (current === task) setStatus('Inspection timed out. Try a smaller document.', true);}, 30000);
-  active.onerror = () => {clearTimeout(timer); active.terminate(); if (current === task) setStatus('The inspector could not finish. Reload the page and try again.', true);};
+  const timer = setTimeout(() => {stopWorker(active); if (current === task) setStatus('Inspection timed out. Try a smaller document.', true);}, 30000);
+  active.onerror = () => {clearTimeout(timer); stopWorker(active); if (current === task) setStatus('The inspector could not finish. Reload the page and try again.', true);};
   active.onmessage = event => {
-    clearTimeout(timer); active.terminate();
+    clearTimeout(timer); stopWorker(active);
     if (current !== task) return;
     if (event.data.error) {setStatus(event.data.error, true); return;}
     report = {...event.data.report, sha256: hash, synthetic};
