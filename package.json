@@ -1,7 +1,7 @@
 {
   "name": "word-sharing-inspector",
   "version": "0.1.1",
-  "description": "Inspect DOCX metadata, comments, tracked changes and hidden text locally. No document uploads.",
+  "description": "Word document inspector for Mac users: review DOCX metadata, comments, tracked changes and hidden text locally in your browser. No uploads.",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -56,6 +56,8 @@
     "docx",
     "document-metadata",
     "microsoft-word",
+    "word-for-mac",
+    "macos",
     "tracked-changes",
     "hidden-text",
     "document-inspection",

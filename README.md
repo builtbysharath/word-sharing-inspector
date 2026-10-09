@@ -1,16 +1,18 @@
-# DOCX Metadata Inspector — Word Sharing Inspector
+# Word Document Inspector for Mac — Word Sharing Inspector
 
 [![CI](https://github.com/builtbysharath/word-sharing-inspector/actions/workflows/ci.yml/badge.svg)](https://github.com/builtbysharath/word-sharing-inspector/actions/workflows/ci.yml)
 
-**Check what travels with a Word document before you share it.**
+**Check Word documents on your Mac before sharing.**
 
 Word Sharing Inspector finds saved comments, tracked changes, hidden text and selected document metadata in `.docx` files. It runs locally in your browser, shows the details for review, and leaves the original file unchanged.
+
+Built for Word for Mac users: [Microsoft documents that Word for Mac has no built-in Document Inspector](https://support.microsoft.com/en-us/office/inspect-document-b0088a7a-d482-4b87-b762-7c94c7c71e23). Open this browser app on your Mac to review supported DOCX details without installing software or uploading your file. The app is also available to other desktop users.
 
 ![Fictional Word proposal: the inspector shows deleted pricing and the replacement as saved tracked changes.](docs/docx-inspector-demo.jpg)
 
 *Fictional sample. Your document is not uploaded. This is an inspector, not a cleaner or a guarantee that a file is safe to share.*
 
-## Try the browser app
+## Try it on your Mac
 
 **[Open Word Sharing Inspector](https://builtbysharath.github.io/word-sharing-inspector/)** — no installation or account needed. Try the fictional sample first. Your selected document is processed in your browser and remains unchanged.
 
@@ -65,7 +67,7 @@ Supports ordinary macro-free `.docx` files up to 25 MB. It does not inspect imag
 
 Try the fictional sample first. [Tell us which findings are useful or confusing](https://github.com/builtbysharath/word-sharing-inspector/issues/new). Share a sanitized report or a fictional reproduction rather than a sensitive document.
 
-[How do I check Word metadata before sharing?](docs/check-word-metadata.md)
+[How do I inspect Word document metadata on Mac?](docs/check-word-metadata.md)
 
 ## Development
 
