@@ -27,9 +27,15 @@ function render(filter = 'all') {
   for (const finding of visible) {
     const card = node('article', null, 'finding');
     card.append(node('span', labels[finding.category], 'badge'), node('h3', finding.title));
+    if (finding.category === 'comments') {
+      const state = finding.resolved === true ? 'Resolved comment · still saved' : finding.resolved === false ? 'Active comment' : 'Saved comment · resolution state unavailable';
+      card.append(node('p', state + (finding.replyToParagraph ? ' · Reply to another comment' : ''), 'byline'));
+    }
     if (finding.author || finding.date) card.append(node('p', [finding.author, finding.date].filter(Boolean).join(' · '), 'byline'));
-    card.append(node('blockquote', finding.detail), node('p', finding.action, 'action'));
-    const source = node('details'); source.append(node('summary', 'Where this was found'), node('code', finding.location || finding.part));
+    card.append(node('blockquote', finding.detail));
+    if (finding.detailTruncated) card.append(node('p', 'Excerpt shortened', 'small'));
+    card.append(node('h4', 'Find and review in Word for Mac'), node('p', finding.action, 'action'));
+    const source = node('details'); source.append(node('summary', 'Technical package location'), node('code', finding.location || finding.part));
     card.append(source); list.append(card);
   }
   $('#shown').textContent = visible.length + ' of ' + report.findings.length + ' findings';

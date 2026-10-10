@@ -12,7 +12,10 @@ const REVISION_TYPES = new Set(['ins', 'del', 'moveFrom', 'moveTo', 'rPrChange',
 const PROPERTY_LABELS = {creator: 'Author', lastModifiedBy: 'Last saved by', created: 'Created', modified: 'Last modified', title: 'Document title', subject: 'Subject', description: 'Description', keywords: 'Keywords', Company: 'Company', Manager: 'Manager', Application: 'Editing application', Template: 'Document template'};
 const decoder = new TextDecoder('utf-8', {fatal: true});
 const whitespace = value => String(value || '').replace(/\s+/g, ' ').trim();
-const excerpt = value => whitespace(value).slice(0, 400);
+const excerpt = value => {
+  const text = whitespace(value);
+  return {detail: text.slice(0, 400), detailTruncated: text.length > 400};
+};
 function elements(node) {
   const output = [], stack = [];
   for (let child = node.lastChild; child; child = child.previousSibling) if (child.nodeType === 1) stack.push({node: child, depth: 1});
@@ -85,7 +88,7 @@ export function inspect(bytes, {filename = 'document.docx'} = {}) {
   if (!mainPart || mainOverride.getAttribute('PartName') !== '/' + mainPart) throw new Error('The Word document relationships disagree with its content types.');
   const main = parse(mainPart);
   if (!word(main.doc.documentElement, 'document')) throw new Error('The main part is not WordprocessingML.');
-  const add = (category, title, part, detail, action, extra = {}) => findings.push({id: 'finding-' + (findings.length + 1), category, title, part, detail: excerpt(detail), action, ...extra});
+  const add = (category, title, part, detail, action, extra = {}) => findings.push({id: 'finding-' + (findings.length + 1), category, title, part, ...excerpt(detail), action, ...extra});
   const declaredTypes = new Map(types.all.filter(node => node.namespaceURI === CT && node.localName === 'Override').map(node => [resolvePart('', node.getAttribute('PartName')), node.getAttribute('ContentType')]));
   const defaultTypes = new Map(types.all.filter(node => node.namespaceURI === CT && node.localName === 'Default').map(node => [node.getAttribute('Extension').toLowerCase(), node.getAttribute('ContentType')]));
   const partType = name => declaredTypes.get(name) || defaultTypes.get(name.split('.').at(-1).toLowerCase()) || '';
@@ -103,7 +106,7 @@ export function inspect(bytes, {filename = 'document.docx'} = {}) {
         const value = whitespace(element.textContent);
         const custom = CUSTOM_PROPERTIES.has(doc.documentElement.namespaceURI);
         if (value && (custom || Object.hasOwn(PROPERTY_LABELS, element.localName))) add('properties', element.getAttribute('name') || PROPERTY_LABELS[element.localName] || element.localName, entry.name, value,
-          'Review document properties and remove values you do not intend to share.', {property: element.localName});
+          'In Word for Mac, use File > Properties to review saved values and remove those you do not intend to share.', {property: element.localName});
       }
     }
     for (const node of all) {
@@ -118,11 +121,11 @@ export function inspect(bytes, {filename = 'document.docx'} = {}) {
         const lastParagraph = elements(node).filter(element => word(element, 'p')).at(-1);
         const extension = commentExtensions.get(lastParagraph?.getAttributeNS(W14, 'paraId'));
         const done = extension?.getAttributeNS(W15, 'done');
-        add('comments', 'Reviewer comment', entry.name, textOf(node), 'In Word, review and delete comments you do not intend to share.', {location: where, author: wattr(node, 'author'), date: wattr(node, 'date'),
+        add('comments', 'Reviewer comment', entry.name, textOf(node), 'In Word for Mac, use the Review tab to review comments and delete those you do not intend to share. Resolved comments can remain saved in the document.', {location: where, author: wattr(node, 'author'), date: wattr(node, 'date'),
           ...(done ? {resolved: ['1', 'true', 'on'].includes(done.toLowerCase())} : {}), ...(extension?.getAttributeNS(W15, 'paraIdParent') ? {replyToParagraph: extension.getAttributeNS(W15, 'paraIdParent')} : {})});
       }
       if (REVISION_TYPES.has(node.localName)) add('revisions', node.localName === 'del' || node.localName === 'moveFrom' ? 'Deleted or moved-out content' : 'Tracked change', entry.name,
-        textOf(node) || 'A saved formatting or structural change is present.', 'Review each change in Word and accept or reject it intentionally.',
+        textOf(node) || 'A saved formatting or structural change is present.', 'In Word for Mac, use the Review tab to review each tracked change and accept or reject it intentionally. Hiding markup does not remove saved changes.',
         {location: where, type: node.localName, author: wattr(node, 'author'), date: wattr(node, 'date')});
       if (node.localName === 'r') {
         const hidden = children(node).filter(element => word(element, 'rPr')).flatMap(hiddenProperties);
