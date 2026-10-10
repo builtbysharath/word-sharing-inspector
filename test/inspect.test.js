@@ -22,6 +22,22 @@ test('sample exposes saved edits, identities, properties and linked/embedded con
 test('inspection leaves the original byte sequence unchanged', () => {
   const bytes = makeDemo(), before = hash(bytes); inspect(bytes); assert.equal(hash(bytes), before);
 });
+test('comment, revision and property excerpts stay bounded with explicit truncation metadata', () => {
+  for (const length of [399, 400, 401, 2000]) {
+    const value = 'x'.repeat(length), parts = demoParts();
+    parts['word/comments.xml'] = parts['word/comments.xml'].replace('Confirm the timeline before sending this.', '  ' + value + '\n  ');
+    parts['word/document.xml'] = parts['word/document.xml'].replace('Internal minimum price: $8,000.', value);
+    parts['docProps/custom.xml'] = parts['docProps/custom.xml'].replace('DEMO-CLIENT-42', value);
+    const report = parse(parts);
+    assert.deepEqual(report.counts, inspect(makeDemo()).counts);
+    for (const finding of report.findings.filter(item => item.category === 'comments' || item.type === 'del' || item.property === 'property')) {
+      assert.equal(finding.detail, value.slice(0, 400));
+      assert.equal(finding.detailTruncated, length > 400);
+      assert.ok(!JSON.stringify(finding).includes('x'.repeat(401)));
+    }
+    assert.ok(report.findings.every(item => typeof item.detailTruncated === 'boolean'));
+  }
+});
 test('an independent python-docx producer fixture preserves comment and hidden-text findings', () => {
   const bytes = readFileSync(new URL('../examples/producer-sample.docx', import.meta.url));
   const before = hash(bytes), report = inspect(bytes, {filename: 'producer-sample.docx'});

@@ -2,12 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
+import {inspect} from '../src/inspect.js';
+import {makeDemo} from '../examples/demo.js';
 
 // Exercise the real browser controller with controllable file reads and workers.
 // Rendering/layout is checked separately in a browser.
 function harness() {
   const nodes = new Map(), workers = [], blobs = [], revoked = [];
-  const element = () => ({textContent: '', hidden: false, disabled: false, value: '', children: [], dataset: {}, listeners: {},
+  const element = tag => ({tag, textContent: '', hidden: false, disabled: false, value: '', children: [], dataset: {}, listeners: {},
     classList: {toggle() {}}, setAttribute() {}, append(...items) {this.children.push(...items);}, replaceChildren(...items) {this.children = items;}, addEventListener(name, fn) {this.listeners[name] = fn;}});
   const select = selector => {if (!nodes.has(selector)) nodes.set(selector, element()); return nodes.get(selector);};
   class Worker {constructor(url) {this.url = url; workers.push(this);} terminate() {this.stopped = true;} postMessage(message) {this.message = message;}}
@@ -23,6 +25,29 @@ test('a slower old file read cannot replace the latest selection', async () => {
   await ui.change({name: 'new.docx', size: 1, arrayBuffer: async () => new Uint8Array([2]).buffer});
   resolveOld(new Uint8Array([1]).buffer); await old;
   assert.equal(ui.workers.length, 1); assert.equal(ui.workers[0].message.filename, 'new.docx');
+});
+test('cards show saved comment states and shortening only for a truncated excerpt, using textContent', async () => {
+  const ui = harness(), report = inspect(makeDemo());
+  const comment = report.findings.find(item => item.category === 'comments');
+  const payload = '<img src=x onerror=alert(1)>';
+  comment.author = payload; comment.detail = payload; comment.resolved = true; comment.replyToParagraph = '11111111'; comment.detailTruncated = true;
+  const active = {...comment, id: 'active', resolved: false, replyToParagraph: undefined, detailTruncated: false};
+  const unknown = {...active, id: 'unknown', resolved: undefined};
+  report.findings = [comment, active, unknown];
+  await ui.change({name: 'sample.docx', size: 1, arrayBuffer: async () => new Uint8Array([1]).buffer});
+  ui.workers[0].onmessage({data: {report}});
+  const [savedCard, activeCard, unknownCard] = ui.select('#findings').children;
+  const texts = card => card.children.map(item => item.textContent);
+  assert.ok(texts(savedCard).includes('Resolved comment · still saved · Reply to another comment'));
+  assert.ok(texts(activeCard).includes('Active comment'));
+  assert.ok(texts(unknownCard).includes('Saved comment · resolution state unavailable'));
+  assert.ok(texts(savedCard).includes('Excerpt shortened'));
+  assert.ok(!texts(activeCard).includes('Excerpt shortened'));
+  assert.ok(!texts(unknownCard).includes('Excerpt shortened'));
+  assert.equal(savedCard.children.find(item => item.tag === 'blockquote').textContent, payload);
+  assert.ok(texts(savedCard).includes('Find and review in Word for Mac'));
+  assert.equal(savedCard.children.at(-1).children[0].textContent, 'Technical package location');
+  assert.ok(!readFileSync(new URL('../web/app.js', import.meta.url), 'utf8').includes('innerHTML'));
 });
 test('clear removes document metadata and invalidates a pending read', async () => {
   const ui = harness(); let resolveRead;
