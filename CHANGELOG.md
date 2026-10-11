@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased: Word for Mac timestamps, 2026-10-11
+
+Comment and tracked-change times now use the UTC values Word saves in `w16du:dateUtc` and `commentsExtensible.xml`. Word writes `w:date` in local time labelled as UTC, so reports were off by the author's time zone offset. Files without the UTC values keep `w:date`.
+
 ## Unreleased: hosted browser worker policy, 2026-10-09
 
 Embed the bundled inspector as a blob worker so it inherits the document's connection-blocking CSP on GitHub Pages. Release its object URL after inspection, timeout, error or Clear. Version the browser controller's URL using its content hash to prevent a fresh page from loading an older cached controller. Existing release archives remain unchanged.
