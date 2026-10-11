@@ -139,6 +139,19 @@ test('deep XML structures fail explicitly rather than returning a clean verdict'
   const parts = demoParts({clean: true}); parts['word/document.xml'] = body('<w:sdt>'.repeat(260) + '</w:sdt>'.repeat(260));
   assert.throws(() => parse(parts), /structure exceeds/);
 });
+test('saved UTC times replace Word local times labelled as UTC', () => {
+  const parts = demoParts(); parts['word/comments.xml'] = parts['word/comments.xml'].replace('<w:p>', '<w:p xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" w14:paraId="01234567">');
+  parts['word/commentsIds.xml'] = '<c:commentsIds xmlns:c="http://schemas.microsoft.com/office/word/2016/wordml/cid"><c:commentId c:paraId="01234567" c:durableId="0A0B0C0D"/></c:commentsIds>';
+  parts['word/commentsExtensible.xml'] = '<x:commentsExtensible xmlns:x="http://schemas.microsoft.com/office/word/2018/wordml/cex"><x:commentExtensible x:durableId="0A0B0C0D" x:dateUtc="2026-10-01T04:30:00Z"/></x:commentsExtensible>';
+  parts['word/document.xml'] = body('<w:p><w:ins xmlns:d="http://schemas.microsoft.com/office/word/2023/wordml/word16du" w:author="R" w:date="2026-10-01T10:00:00Z" d:dateUtc="2026-10-01T04:30:00Z"><w:r><w:t>Added</w:t></w:r></w:ins>' +
+    '<w:del w:author="R" w:date="2026-10-01T10:00:00Z"><w:r><w:delText>Removed</w:delText></w:r></w:del></w:p>');
+  const report = parse(parts);
+  assert.equal(report.findings.find(item => item.category === 'comments').date, '2026-10-01T04:30:00Z');
+  assert.equal(report.findings.find(item => item.type === 'ins').date, '2026-10-01T04:30:00Z');
+  assert.equal(report.findings.find(item => item.type === 'del').date, '2026-10-01T10:00:00Z');
+  delete parts['word/commentsExtensible.xml'];
+  assert.equal(parse(parts).findings.find(item => item.category === 'comments').date, '2026-10-01T10:00:00Z');
+});
 test('header revisions are inspected as well as the main body', () => {
   const parts = demoParts({clean: true}); parts['word/header1.xml'] = '<w:hdr xmlns:w="' + WORD_NS + '"><w:p><w:del w:author="Header Reviewer"><w:r><w:delText>Old header</w:delText></w:r></w:del></w:p></w:hdr>';
   assert.equal(parse(parts).findings[0].part, 'word/header1.xml');

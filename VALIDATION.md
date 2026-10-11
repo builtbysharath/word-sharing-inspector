@@ -22,6 +22,16 @@ The 0.1.1 suite passes all 42 tests on Node 22.23.3 and the development Node 23.
 
 GitHub Pages does not send the local server's CSP response header for `worker.js`. The browser now starts an embedded blob worker, which [inherits the document's CSP](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers#content_security_policy). The page permits only blob workers and keeps `connect-src 'none'`. A separate local browser probe using the actual compiled worker plus a synthetic fetch attempt showed `Worker fetch: BLOCKED` and one imported-content finding under the same meta CSP, without relying on response headers. The rebuilt app still returned nine sample findings. A controller regression verifies termination and URL release on Clear; the hosted-policy baseline had 43 passing tests. The probe is local verification material, outside the published static assets. This is a tested browser policy boundary, not a comprehensive security audit or native Office rendering check.
 
+## Native Word for Mac check, 11 October 2026
+
+Word for Mac 16.113.3 saved two test documents: one built through Word's AppleScript interface (comment, tracked insertion and deletion, hidden text, header text), and a copy where a reply was added and the thread resolved in Word's Review tab. The inspector reported the comment, both revisions, the hidden text, author and reviewer identity properties, and the reply link and resolved state on both comments.
+
+- It also reported the tracked insertion as hidden text. The XML confirms Word applied the preceding hidden formatting to text added after it.
+- Word saved `w:date` as local time labelled UTC (`19:07Z` beside `dateUtc` `13:37Z`, in UTC+5:30). Comment and revision times now use the saved UTC values.
+- Header text without revisions is not reported.
+
+The native files contain the tester's real account identity, so they are not committed.
+
 ## Published baseline and current verification
 
 The 9 October release records identify `ce35fcc1d439f808ebc210af0e46d9832d5de5ea` as the published main commit, with four successful CI jobs and a successful GitHub Pages deployment. The [hosted browser inspector](https://builtbysharath.github.io/word-sharing-inspector/) was verified at that milestone. Earlier sections describe their own historical validation; they do not verify subsequent changes or native Office behavior.

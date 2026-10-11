@@ -6,6 +6,11 @@ const R = new Set(['http://schemas.openxmlformats.org/package/2006/relationships
 const CT = 'http://schemas.openxmlformats.org/package/2006/content-types';
 const W15 = 'http://schemas.microsoft.com/office/word/2012/wordml';
 const W14 = 'http://schemas.microsoft.com/office/word/2010/wordml';
+// Word saves w:date in local time labelled as UTC. Newer versions also save
+// the real UTC time in these extension namespaces.
+const W16DU = 'http://schemas.microsoft.com/office/word/2023/wordml/word16du';
+const W16CID = 'http://schemas.microsoft.com/office/word/2016/wordml/cid';
+const W16CEX = 'http://schemas.microsoft.com/office/word/2018/wordml/cex';
 const CUSTOM_PROPERTIES = new Set(['http://schemas.openxmlformats.org/officeDocument/2006/custom-properties', 'http://purl.oclc.org/ooxml/officeDocument/customProperties']);
 const MAIN_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml';
 const REVISION_TYPES = new Set(['ins', 'del', 'moveFrom', 'moveTo', 'rPrChange', 'pPrChange', 'tblPrChange', 'tblGridChange', 'trPrChange', 'tcPrChange', 'sectPrChange', 'numberingChange', 'cellIns', 'cellDel', 'cellMerge']);
@@ -94,9 +99,11 @@ export function inspect(bytes, {filename = 'document.docx'} = {}) {
   const partType = name => declaredTypes.get(name) || defaultTypes.get(name.split('.').at(-1).toLowerCase()) || '';
   const propertyPart = name => name.startsWith('docProps/') && /\.xml$/i.test(name) || /(?:core-properties|extended-properties|custom-properties)\+xml$/.test(partType(name));
   const xmlEntries = pkg.entries.filter(entry => !entry.name.endsWith('/') && (entry.name.startsWith('word/') && /\.xml$/i.test(entry.name) || propertyPart(entry.name) || entry.name === mainPart || /(?:wordprocessingml\.|vnd\.ms-word\.).*\+xml$/.test(partType(entry.name))));
-  const commentExtensions = new Map();
+  const commentExtensions = new Map(), commentDurableIds = new Map(), commentUtcDates = new Map();
   for (const entry of xmlEntries) for (const node of parse(entry.name).all) {
     if (node.namespaceURI === W15 && node.localName === 'commentEx') commentExtensions.set(node.getAttributeNS(W15, 'paraId'), node);
+    if (node.namespaceURI === W16CID && node.localName === 'commentId' && node.getAttributeNS(W16CID, 'paraId')) commentDurableIds.set(node.getAttributeNS(W16CID, 'paraId'), node.getAttributeNS(W16CID, 'durableId'));
+    if (node.namespaceURI === W16CEX && node.localName === 'commentExtensible' && node.getAttributeNS(W16CEX, 'durableId')) commentUtcDates.set(node.getAttributeNS(W16CEX, 'durableId'), node.getAttributeNS(W16CEX, 'dateUtc'));
   }
   for (const entry of xmlEntries) {
     const {doc, all} = parse(entry.name);
@@ -119,14 +126,15 @@ export function inspect(bytes, {filename = 'document.docx'} = {}) {
       const where = location(node, entry.name, paragraphs);
       if (node.localName === 'comment') {
         const lastParagraph = elements(node).filter(element => word(element, 'p')).at(-1);
-        const extension = commentExtensions.get(lastParagraph?.getAttributeNS(W14, 'paraId'));
+        const paraId = lastParagraph?.getAttributeNS(W14, 'paraId');
+        const extension = commentExtensions.get(paraId);
         const done = extension?.getAttributeNS(W15, 'done');
-        add('comments', 'Reviewer comment', entry.name, textOf(node), 'In Word for Mac, use the Review tab to review comments and delete those you do not intend to share. Resolved comments can remain saved in the document.', {location: where, author: wattr(node, 'author'), date: wattr(node, 'date'),
+        add('comments', 'Reviewer comment', entry.name, textOf(node), 'In Word for Mac, use the Review tab to review comments and delete those you do not intend to share. Resolved comments can remain saved in the document.', {location: where, author: wattr(node, 'author'), date: commentUtcDates.get(commentDurableIds.get(paraId)) || wattr(node, 'date'),
           ...(done ? {resolved: ['1', 'true', 'on'].includes(done.toLowerCase())} : {}), ...(extension?.getAttributeNS(W15, 'paraIdParent') ? {replyToParagraph: extension.getAttributeNS(W15, 'paraIdParent')} : {})});
       }
       if (REVISION_TYPES.has(node.localName)) add('revisions', node.localName === 'del' || node.localName === 'moveFrom' ? 'Deleted or moved-out content' : 'Tracked change', entry.name,
         textOf(node) || 'A saved formatting or structural change is present.', 'In Word for Mac, use the Review tab to review each tracked change and accept or reject it intentionally. Hiding markup does not remove saved changes.',
-        {location: where, type: node.localName, author: wattr(node, 'author'), date: wattr(node, 'date')});
+        {location: where, type: node.localName, author: wattr(node, 'author'), date: node.getAttributeNS(W16DU, 'dateUtc') || wattr(node, 'date')});
       if (node.localName === 'r') {
         const hidden = children(node).filter(element => word(element, 'rPr')).flatMap(hiddenProperties);
         if (hidden.length) {
